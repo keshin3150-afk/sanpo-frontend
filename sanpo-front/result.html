@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>sanpo / 透明化レポート（Balanced）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #11161d;
+      --panel-light: #161d26;
+      --accent: #7dd3fc;
+      --accent-soft: rgba(125, 211, 252, 0.12);
+      --text-main: #e2e8f0;
+      --text-sub: #94a3b8;
+      --radius: 14px;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #1e293b 0%, #0b0f14 60%);
+      color: var(--text-main);
+      font-family: var(--font);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 32px 16px 48px;
+    }
+
+    .card {
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 26px 24px 28px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 24px 0 12px;
+    }
+
+    /* facts：軽い表形式（A と B の中間） */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    th {
+      color: var(--text-sub);
+      width: 32%;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    /* insights：読みやすいカード */
+    .insight-item {
+      background: var(--panel-light);
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .loading {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-top: 10px;
+    }
+
+    .error {
+      font-size: 14px;
+      color: #f87171;
+      margin-top: 10px;
+    }
+
+    .footer {
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-sub);
+      line-height: 1.6;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <section class="card">
+      <h1>透明化レポート</h1>
+      <p class="subtitle" id="targetUrlText"></p>
+
+      <!-- レイヤー1 -->
+      <div class="section-title">レイヤー1：事実の抽出</div>
+      <table id="factsTable">
+        <tr><td class="loading">抽出中…</td></tr>
+      </table>
+
+      <!-- レイヤー2 -->
+      <div class="section-title">レイヤー2：人智の濾過</div>
+      <div id="insightArea">
+        <p class="loading">解析中…</p>
+      </div>
+
+      <p class="footer">
+        sanpo は「判断を代行する OS」ではなく、  
+        あなたの判断を支えるための透明化レイヤーです。
+      </p>
+    </section>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get("url");
+
+    const targetUrlText = document.getElementById("targetUrlText");
+    const factsTable = document.getElementById("factsTable");
+    const insightArea = document.getElementById("insightArea");
+
+    if (!targetUrl) {
+      targetUrlText.textContent = "URL が指定されていません。";
+      factsTable.innerHTML = "<tr><td class='error'>URL がありません。</td></tr>";
+      insightArea.innerHTML = "<p class='error'>解析できません。</p>";
+    } else {
+      targetUrlText.textContent = "対象 URL: " + targetUrl;
+      fetchReport(targetUrl);
+    }
+
+    async function fetchReport(url) {
+      try {
+        const endpoint = "https://sanpo-proxy.sanpo-os.com/analyze";
+        const res = await fetch(endpoint + "?url=" + encodeURIComponent(url));
+
+        if (!res.ok) throw new Error("API error");
+
+        const data = await res.json();
+        renderFacts(data.facts);
+        renderInsights(data.insights);
+
+      } catch (err) {
+        factsTable.innerHTML = "<tr><td class='error'>抽出に失敗しました。</td></tr>";
+        insightArea.innerHTML = "<p class='error'>解析に失敗しました。</p>";
+      }
+    }
+
+    function renderFacts(facts) {
+      if (!facts) {
+        factsTable.innerHTML = "<tr><td class='error'>抽出結果がありません。</td></tr>";
+        return;
+      }
+
+      factsTable.innerHTML = "";
+
+      Object.entries(facts).forEach(([key, value]) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <th>${key}</th>
+          <td>${value ?? "—"}</td>
+        `;
+        factsTable.appendChild(row);
+      });
+    }
+
+    function renderInsights(insights) {
+      if (!insights) {
+        insightArea.innerHTML = "<p class='error'>洞察がありません。</p>";
+        return;
+      }
+
+      insightArea.innerHTML = "";
+
+      insights.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "insight-item";
+        div.textContent = item;
+        insightArea.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
