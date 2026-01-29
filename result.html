@@ -3,186 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sanpo / 透明化レポート</title>
+  <title>sanpo - 透明化レポート</title>
 
   <style>
-    :root {
-      --bg: #f0f6fa;
-      --panel: #ffffff;
-      --border: #d7e3eb;
-      --accent: #7dd3fc;
-      --accent-soft: rgba(125, 211, 252, 0.15);
-      --text-main: #2e2e2e;
-      --text-sub: #6b7280;
-      --radius: 10px;
-      --font: "Noto Sans JP", sans-serif;
-    }
-
     body {
-      margin: 0;
-      padding: 24px;
-      background: var(--bg);
-      font-family: var(--font);
-      color: var(--text-main);
+      font-family: sans-serif;
+      padding: 20px;
       line-height: 1.6;
     }
-
-    h1 {
-      font-size: 22px;
-      margin-bottom: 16px;
-      border-bottom: 2px solid #b7dde2;
-      padding-bottom: 8px;
+    h2 {
+      margin-top: 30px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
     }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-
-    .deep-section-title {
-      margin-top: 32px;
-      margin-bottom: 12px;
-      padding: 8px 12px;
-      background: #e8f2f7;
-      border-left: 4px solid #b7dde2;
-      font-weight: 600;
-      font-size: 15px;
-    }
-
-    details {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--panel);
-      margin-bottom: 12px;
-      padding: 12px;
-    }
-
-    summary {
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .locked {
-      opacity: 0.65;
-      position: relative;
-    }
-
-    .locked::after {
-      content: "🔒 有料カード";
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      font-size: 12px;
-      color: var(--text-sub);
-    }
-
-    .fact-title {
-      margin-top: 12px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .fact-block {
-      margin-left: 8px;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .subtle {
-      font-size: 13px;
-      color: var(--text-sub);
-    }
-
-    #error-area {
-      display: none;
-      color: #ef4444;
-      margin-bottom: 16px;
-      font-size: 14px;
+    ul {
+      padding-left: 20px;
     }
   </style>
 </head>
 
-<body>
+<body onload="loadResult()">
 
-  <h1 id="title">読み込み中…</h1>
+  <h1>透明化レポート</h1>
 
-  <div id="error-area"></div>
+  <h2>基本情報</h2>
+  <p>家賃：<span id="rent">読み込み中…</span></p>
+  <p>間取り：<span id="layout">読み込み中…</span></p>
+  <p>専有面積：<span id="area">読み込み中…</span></p>
+  <p>駅距離：<span id="station">読み込み中…</span></p>
 
-  <!-- 基本情報 -->
-  <div class="card">
-    <div class="section-title">基本情報</div>
-    <div id="rent">家賃：読み込み中…</div>
-    <div id="layout">間取り：読み込み中…</div>
-    <div id="age">築年数：読み込み中…</div>
-    <div id="area">専有面積：読み込み中…</div>
-  </div>
-
-  <!-- 駅距離 -->
-  <div class="card">
-    <div class="section-title">駅距離</div>
-    <div id="station">読み込み中…</div>
-  </div>
-
-  <!-- 街の人口 -->
-  <div class="card">
-    <div class="section-title">街の人口（区単位）</div>
-    <div id="population">読み込み中…</div>
-  </div>
-
-  <!-- 要点 -->
-  <div class="card">
-    <div class="section-title">物件の要点</div>
-    <ul id="points">
-      <li>読み込み中…</li>
-    </ul>
-  </div>
-
-  <!-- 深掘り -->
-  <div class="deep-section-title">深掘り（有料）</div>
-
-  <!-- 騒音 -->
-  <details class="locked">
-    <summary>騒音</summary>
-
-    <div class="fact-title">【事実（Fact）】</div>
-    <div class="fact-block" id="noise-fact">読み込み中…</div>
-
-    <div class="fact-title">【補足（Note）】</div>
-    <div class="fact-block subtle" id="noise-note">読み込み中…</div>
-
-    <div class="fact-title">【限界（Limit）】</div>
-    <div class="fact-block subtle" id="noise-limit">読み込み中…</div>
-
-    <div class="fact-title">【出典（Source）】</div>
-    <div class="fact-block subtle" id="noise-source">読み込み中…</div>
-  </details>
-
-  <!-- 建物構造 -->
-  <details class="locked">
-    <summary>建物構造</summary>
-
-    <div class="fact-title">【事実（Fact）】</div>
-    <div class="fact-block" id="structure-fact">読み込み中…</div>
-
-    <div class="fact-title">【補足（Note）】</div>
-    <div class="fact-block subtle" id="structure-note">読み込み中…</div>
-
-    <div class="fact-title">【限界（Limit）】</div>
-    <div class="fact-block subtle" id="structure-limit">読み込み中…</div>
-
-    <div class="fact-title">【出典（Source）】</div>
-    <div class="fact-block subtle" id="structure-source">読み込み中…</div>
-  </details>
+  <h2>物件の要点</h2>
+  <ul id="points">
+    <li>読み込み中…</li>
+  </ul>
 
   <script src="result.js"></script>
 </body>
