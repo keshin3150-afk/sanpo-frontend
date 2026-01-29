@@ -114,7 +114,7 @@
       errorEl.textContent = "URL パラメータが見つかりません。";
       errorEl.style.display = "block";
     } else {
-      fetch("https://sanpo-api.sanpo-os.com/api?url=" + encodeURIComponent(targetUrl))
+      fetch("https://sanpo-api.keshin3150-afk.workers.dev/?url=" + encodeURIComponent(targetUrl))
         .then(res => res.json())
         .then(data => {
           loadingEl.style.display = "none";
