@@ -1,120 +1,99 @@
-// ------------------------------
-// 1. URL パラメータを取得
-// ------------------------------
-const params = new URLSearchParams(window.location.search);
-const targetUrl = params.get("url");
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const targetUrl = params.get("url");
 
-if (!targetUrl) {
-  showError("URL が取得できませんでした。index.html からやり直してください。");
-  throw new Error("URL parameter missing");
-}
+  if (!targetUrl) {
+    alert("URL が指定されていません。index.html に戻ってください。");
+    return;
+  }
 
-// ------------------------------
-// 2. Workers API にリクエスト
-// ------------------------------
-async function fetchData() {
-  const endpoint = "https://sanpo-proxy.your-domain.workers.dev/extract";
+  // ★ ここが今回の最重要ポイント（Workers の接続先）
+  const endpoint = "https://sanpo-api.udsmail.workers.dev/extract";
 
   try {
-    const res = await fetch(endpoint + "?url=" + encodeURIComponent(targetUrl));
+    const res = await fetch(`${endpoint}?url=${encodeURIComponent(targetUrl)}`);
+    const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error("API error: " + res.status);
+    // ------------------------------
+    // 基本情報
+    // ------------------------------
+    document.getElementById("title").textContent =
+      data.title || "不明";
+
+    document.getElementById("rent").textContent =
+      "家賃：" + (data.rent || "不明");
+
+    document.getElementById("layout").textContent =
+      "間取り：" + (data.layout || "不明");
+
+    document.getElementById("age").textContent =
+      "築年数：" + (data.age || "不明");
+
+    document.getElementById("area").textContent =
+      "専有面積：" + (data.area || "不明");
+
+    // ------------------------------
+    // 駅距離
+    // ------------------------------
+    document.getElementById("station_distance").textContent =
+      data.station_distance || "不明";
+
+    // ------------------------------
+    // 人口
+    // ------------------------------
+    document.getElementById("population").textContent =
+      data.population || "不明";
+
+    // ------------------------------
+    // 要点（配列）
+    // ------------------------------
+    const pointsList = document.getElementById("points");
+    pointsList.innerHTML = "";
+
+    if (Array.isArray(data.points)) {
+      data.points.forEach((p) => {
+        const li = document.createElement("li");
+        li.textContent = p;
+        pointsList.appendChild(li);
+      });
+    } else {
+      const li = document.createElement("li");
+      li.textContent = "不明";
+      pointsList.appendChild(li);
     }
 
-    const data = await res.json();
-    return data;
+    // ------------------------------
+    // 深掘り：騒音
+    // ------------------------------
+    document.getElementById("noise_fact").textContent =
+      data.noise?.fact || "不明";
+
+    document.getElementById("noise_note").textContent =
+      data.noise?.note || "不明";
+
+    document.getElementById("noise_limit").textContent =
+      data.noise?.limit || "不明";
+
+    document.getElementById("noise_source").textContent =
+      data.noise?.source || "不明";
+
+    // ------------------------------
+    // 深掘り：建物構造
+    // ------------------------------
+    document.getElementById("structure_fact").textContent =
+      data.structure?.fact || "不明";
+
+    document.getElementById("structure_note").textContent =
+      data.structure?.note || "不明";
+
+    document.getElementById("structure_limit").textContent =
+      data.structure?.limit || "不明";
+
+    document.getElementById("structure_source").textContent =
+      data.structure?.source || "不明";
 
   } catch (err) {
     console.error(err);
-    showError("透明化に失敗しました。URL を確認してください。");
-    return null;
+    alert("データの取得に失敗しました。Workers 側を確認してください。");
   }
-}
-
-// ------------------------------
-// 3. UI に反映
-// ------------------------------
-function render(data) {
-  if (!data) return;
-
-  // タイトル
-  document.getElementById("title").textContent =
-    data.title || "タイトル不明";
-
-  // 基本情報
-  document.getElementById("rent").textContent =
-    "家賃：" + (data.rent || "不明");
-
-  document.getElementById("layout").textContent =
-    "間取り：" + (data.layout || "不明");
-
-  document.getElementById("age").textContent =
-    "築年数：" + (data.age || "不明");
-
-  document.getElementById("area").textContent =
-    "専有面積：" + (data.area || "不明");
-
-  // 駅距離
-  document.getElementById("station").textContent =
-    data.station_distance || "不明";
-
-  // 人口
-  document.getElementById("population").textContent =
-    data.population || "不明";
-
-  // 要点（配列）
-  const pointsEl = document.getElementById("points");
-  pointsEl.innerHTML = "";
-  if (Array.isArray(data.points)) {
-    data.points.forEach(p => {
-      const li = document.createElement("li");
-      li.textContent = p;
-      pointsEl.appendChild(li);
-    });
-  } else {
-    pointsEl.innerHTML = "<li>不明</li>";
-  }
-
-  // 深掘り（有料）
-  setDeep("noise", data.noise);
-  setDeep("structure", data.structure);
-}
-
-// ------------------------------
-// 4. 深掘りカードの共通処理
-// ------------------------------
-function setDeep(prefix, obj) {
-  if (!obj) return;
-
-  document.getElementById(`${prefix}-fact`).textContent =
-    obj.fact || "不明";
-
-  document.getElementById(`${prefix}-note`).textContent =
-    obj.note || "不明";
-
-  document.getElementById(`${prefix}-limit`).textContent =
-    obj.limit || "不明";
-
-  document.getElementById(`${prefix}-source`).textContent =
-    obj.source || "不明";
-}
-
-// ------------------------------
-// 5. エラー表示
-// ------------------------------
-function showError(message) {
-  const el = document.getElementById("error-area");
-  el.textContent = message;
-  el.style.display = "block";
-}
-
-// ------------------------------
-// 6. メイン処理
-// ------------------------------
-async function main() {
-  const data = await fetchData();
-  render(data);
-}
-
-main();
+});
