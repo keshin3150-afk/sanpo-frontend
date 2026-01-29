@@ -1,5 +1,3 @@
-{
-  "version": 1,
-  "include": ["/*"],
-  "exclude": []
-}
+[
+  { "src": "/result", "dest": "/result.html" }
+]
