@@ -1,51 +1,181 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>透明化レポート - sanpo</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      line-height: 1.6;
-    }
-    .item {
-      margin: 12px 0;
-    }
-    strong {
-      color: #333;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>sanpo result</title>
+
+<style>
+  body {
+    font-family: "Noto Sans JP", sans-serif;
+    background: #F0F6FA;
+    color: #2E2E2E;
+    margin: 0;
+    padding: 24px;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #B7DDE2;
+    padding-bottom: 8px;
+  }
+
+  .card {
+    background: #FFFFFF;
+    border: 1px solid #D7E3EB;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .deep-section-title {
+    margin-top: 32px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #E8F2F7;
+    border-left: 4px solid #B7DDE2;
+    font-weight: 500;
+  }
+
+  details {
+    border: 1px solid #D7E3EB;
+    border-radius: 6px;
+    background: #FFFFFF;
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .locked {
+    opacity: 0.6;
+    position: relative;
+  }
+
+  .locked::after {
+    content: "🔒 有料カード";
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 12px;
+    color: #6B7280;
+  }
+
+  .fact-title {
+    margin-top: 12px;
+    font-weight: 600;
+    color: #2E2E2E;
+  }
+
+  .fact-block {
+    margin-left: 8px;
+    margin-bottom: 8px;
+  }
+
+  .subtle {
+    font-size: 13px;
+    color: #6B7280;
+  }
+</style>
 </head>
+
 <body>
 
-  <h1 id="name">読み込み中…</h1>
+<h1>物件タイトルが入ります</h1>
 
-  <div class="item">
-    <strong>家賃：</strong>
-    <span id="rent"></span>
+<div class="card">
+  <div class="section-title">基本情報</div>
+  <div>家賃：xx万円</div>
+  <div>間取り：1LDK</div>
+  <div>築年数：12年</div>
+  <div>専有面積：40㎡</div>
+</div>
+
+<div class="card">
+  <div class="section-title">駅距離</div>
+  <div>○○駅 徒歩8分</div>
+</div>
+
+<div class="card">
+  <div class="section-title">街の人口（区単位）</div>
+  <div>福岡市中央区：198,000人</div>
+</div>
+
+<div class="card">
+  <div class="section-title">物件の要点</div>
+  <ul>
+    <li>事実のみを箇条書き</li>
+    <li>推測ゼロ</li>
+  </ul>
+</div>
+
+<div class="deep-section-title">深掘り（有料）</div>
+
+<!-- 騒音 -->
+<details class="locked">
+  <summary>騒音</summary>
+
+  <div class="fact-title">【事実（Fact）】</div>
+  <div class="fact-block">
+    ・道路交通：◯◯dB（昼）／◯◯dB（夜）<br>
+    ・鉄道：◯◯m地点に線路あり（◯◯dB）<br>
+    ・商業施設：◯◯m地点に◯◯あり
   </div>
 
-  <div class="item">
-    <strong>駅距離：</strong>
-    <span id="station"></span>
+  <div class="fact-title">【補足（Note）】</div>
+  <div class="fact-block subtle">
+    ・dB値は行政データに基づきます
   </div>
 
-  <div class="item">
-    <strong>初期費用：</strong>
-    <span id="initial"></span>
+  <div class="fact-title">【限界（Limit）】</div>
+  <div class="fact-block subtle">
+    ・物件単位の騒音は現地状況に依存します
   </div>
 
-  <div class="item">
-    <strong>注意点：</strong>
-    <div id="notes"></div>
+  <div class="fact-title">【出典（Source）】</div>
+  <div class="fact-block subtle">
+    ・国交省 騒音データベース
+  </div>
+</details>
+
+<!-- 建物構造 -->
+<details class="locked">
+  <summary>建物構造</summary>
+
+  <div class="fact-title">【事実（Fact）】</div>
+  <div class="fact-block">
+    ・構造：RC造<br>
+    ・階数：◯階建て<br>
+    ・窓：複層ガラス（あり）
   </div>
 
-  <div class="item">
-    <strong>透明化ポイント：</strong>
-    <div id="points"></div>
+  <div class="fact-title">【補足（Note）】</div>
+  <div class="fact-block subtle">
+    ・遮音・断熱は構造と仕様に依存します
   </div>
 
-  <script src="result.js"></script>
+  <div class="fact-title">【限界（Limit）】</div>
+  <div class="fact-block subtle">
+    ・図面と現況が異なる場合があります
+  </div>
+
+  <div class="fact-title">【出典（Source）】</div>
+  <div class="fact-block subtle">
+    ・不動産公開情報
+  </div>
+</details>
+
+<!-- 以下、図面・周辺環境・治安・相場・初期費用・比較も同じ構造で続く -->
+
 </body>
 </html>
