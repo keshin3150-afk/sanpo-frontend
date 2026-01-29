@@ -1,4 +1,6 @@
-// ① 汎用抽出エンジン（Universal Extractor）
+// ------------------------------
+// ① 汎用抽出エンジン
+// ------------------------------
 function extractGeneric(html) {
   const text = html.replace(/\s+/g, " ");
 
@@ -21,7 +23,9 @@ function extractGeneric(html) {
   };
 }
 
-// ② 透明化レイヤー（sanpo OS のコア）
+// ------------------------------
+// ② 透明化レイヤー
+// ------------------------------
 function toTransparentView(data) {
   return {
     title: data.title || "物件名はページ内から特定できませんでした",
@@ -41,9 +45,34 @@ function toTransparentView(data) {
   };
 }
 
-// ③ Workers → 抽出 → 透明化 → UI 表示
+// ------------------------------
+// ③ UI 反映
+// ------------------------------
+function renderTransparentView(data) {
+  document.getElementById("rent").textContent = data.rent;
+  document.getElementById("layout").textContent = data.layout;
+  document.getElementById("area").textContent = data.area;
+  document.getElementById("station").textContent = data.station_distance;
+
+  const pointsEl = document.getElementById("points");
+  pointsEl.innerHTML = "";
+  data.points.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p;
+    pointsEl.appendChild(li);
+  });
+}
+
+// ------------------------------
+// ④ Workers → 抽出 → 透明化 → UI
+// ------------------------------
 async function loadResult() {
   const url = new URLSearchParams(location.search).get("url");
+
+  if (!url) {
+    console.error("URL パラメータがありません");
+    return;
+  }
 
   const res = await fetch(
     `https://sanpo-api.udsmail.workers.dev/extract?url=${encodeURIComponent(url)}`
