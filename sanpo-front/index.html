@@ -219,23 +219,29 @@
   </div>
 
   <script>
-  const params = new URLSearchParams(window.location.search);
-  const targetUrl = params.get("url");
+    const form = document.getElementById("urlForm");
+    const input = document.getElementById("targetUrl");
+    const errorMessage = document.getElementById("errorMessage");
 
-  if (targetUrl) {
-    fetch("https://sanpo-api.sanpo-os.com/api?url=" + encodeURIComponent(targetUrl))
-      .then(res => res.json())
-      .then(data => {
-        console.log("API結果:", data);
-        // ここで画面に表示する処理を追加できます
-      })
-      .catch(err => {
-        console.error("APIエラー:", err);
-      });
-  } else {
-    console.error("URL パラメータが見つかりません");
-  }
-</script>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      errorMessage.style.display = "none";
+
+      const url = input.value.trim();
+      if (!url) {
+        errorMessage.textContent = "URL が空です。貼り付けてから送信してください。";
+        errorMessage.style.display = "block";
+        return;
+      }
+
+      try {
+        const encoded = encodeURIComponent(url);
+        window.location.href = "result.html?url=" + encoded;
+      } catch (err) {
+        errorMessage.textContent = "URL の処理中にエラーが発生しました。";
+        errorMessage.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
-
