@@ -61,7 +61,7 @@ async function main() {
   document.getElementById("urlDisplay").textContent = url;
 
   try {
-    const apiUrl = "https://sanpo-proxy.keshin3150-afk.workers.dev/?url=" + encodeURIComponent(url);
+    const apiUrl = "https://sanpo-proxy.udsmail.workers.dev/?url=" + encodeURIComponent(url);
     const res = await fetch(apiUrl);
     const data = await res.json();
 
