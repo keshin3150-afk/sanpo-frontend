@@ -40,7 +40,6 @@ function go() {
     return;
   }
 
-  // URL の形式が怪しい場合でも result.html 側で処理できるようにする
   const encoded = encodeURIComponent(url);
   location.href = "result.html?url=" + encoded;
 }
