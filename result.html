@@ -1,30 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sanpo - 結果</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      line-height: 1.6;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
 <body>
 
-<pre id="raw">読み込み中...</pre>
+<div class="section">
+  <div class="title">URL</div>
+  <div id="urlDisplay"></div>
+</div>
+
+<div class="section">
+  <div class="title">みえること</div>
+  <div id="visible"></div>
+</div>
+
+<div class="section">
+  <div class="title">よみとれること</div>
+  <div id="readable"></div>
+</div>
+
+<div class="section">
+  <div class="title">生データ</div>
+  <pre id="raw"></pre>
+</div>
 
 <script>
-const params = new URLSearchParams(location.search);
-const targetUrl = params.get("url");
+async function main() {
+  const params = new URLSearchParams(location.search);
+  const url = params.get("url");
 
-if (!targetUrl) {
-  document.getElementById("raw").textContent = "URLが指定されていません";
-  throw new Error("No URL");
+  if (!url) {
+    document.body.innerHTML = "<p>URL が指定されていません。</p>";
+    return;
+  }
+
+  document.getElementById("urlDisplay").textContent = url;
+
+  try {
+    const apiUrl = "https://sanpo-proxy.keshin3150-afk.workers.dev/?url=" + encodeURIComponent(url);
+    const res = await fetch(apiUrl);
+    const data = await res.json();
+
+    // みえること
+    document.getElementById("visible").textContent =
+      data.visible ? data.visible.join("\n") : "なし";
+
+    // よみとれること
+    document.getElementById("readable").textContent =
+      data.readable ? data.readable.join("\n") : "なし";
+
+    // 生データ
+    document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+
+  } catch (e) {
+    document.body.innerHTML = "<p>エラーが発生しました。</p><pre>" + e + "</pre>";
+  }
 }
 
-const PROXY = "https://sanpo-proxy.udsmail.workers.dev";
-
-console.log("fetching:", targetUrl);
-
-fetch(PROXY + "?url=" + encodeURIComponent(targetUrl))
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
-  })
-  .catch(err => {
-    document.getElementById("raw").textContent = "エラー: " + err;
-  });
+main();
 </script>
 
 </body>
